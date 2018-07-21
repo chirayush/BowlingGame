@@ -1,46 +1,58 @@
+import java.util.ArrayList;
+import java.util.List;
+
 final class BowlingGame {
-    private int currentRoll = 0;
-    private int[] rolls = new int[21];
+
+    private Frame currentFrame;
+    private int frameIndex = 0;
+    private List<Frame> frames;
+
+    BowlingGame() {
+        frames = new ArrayList<>();
+    }
 
     void roll(int pins) {
-        rolls[currentRoll++] = pins;
+        if (frameIndex == 0) {
+            currentFrame = new Frame();
+            currentFrame.addRoll(pins);
+            if (pins == 10) {
+                frames.add(currentFrame);
+                return;
+            }
+            frameIndex++;
+            return;
+        }
+        if (frameIndex == 1) {
+            currentFrame.addRoll(pins);
+            frameIndex = 0;
+            frames.add(currentFrame);
+        }
     }
 
     int score() {
         int score = 0;
-        int frameIndex = 0;
-        for (int frame = 0; frame < 10; frame++) {
-            if (isStrike(frameIndex)) {
+        for (int frameIndex = 0; frameIndex < frames.size(); frameIndex++) {
+            Frame frame = frames.get(frameIndex);
+            if (frame.isStrike()) {
                 score += 10 + strikeBonus(frameIndex);
-                frameIndex += 1;
-            } else if (isSpare(frameIndex)) {
-                score += 10 + spareBonus(rolls[frameIndex + 2]);
-                frameIndex += 2;
+            } else if (frame.isSpare()) {
+                score += 10 + spareBonus(frameIndex);
             } else {
-                score += frameTotal(frameIndex);
-                frameIndex += 2;
+                score += frame.getScore();
             }
         }
         return score;
     }
 
-    private int frameTotal(int frameIndex) {
-        return rolls[frameIndex] + rolls[frameIndex + 1];
-    }
-
-    private int spareBonus(int roll) {
-        return roll;
-    }
-
     private int strikeBonus(int frameIndex) {
-        return rolls[frameIndex + 1] + rolls[frameIndex + 2];
+        return getNextFrame(frameIndex).getScore();
     }
 
-    private boolean isStrike(int frameIndex) {
-        return rolls[frameIndex] == 10;
+    private int spareBonus(int frameIndex) {
+        return getNextFrame(frameIndex).getScoreOfFirstRoll();
     }
 
-    private boolean isSpare(int frameIndex) {
-        return frameTotal(frameIndex) == 10;
+    private Frame getNextFrame(int frameIndex) {
+        return frames.get(frameIndex + 1);
     }
 }

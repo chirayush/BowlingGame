@@ -16,8 +16,9 @@ public class BowlingGameTest {
         assertThat(0, is(game.score()));
     }
 
+
     @Test
-    public void scoreShouldBeTenIfAllOnesRolled() {
+    public void scoreShouldBeTwentyIfAllOnesRolled() {
         rollMany(20, 1);
         assertEquals(20, game.score());
     }
@@ -26,8 +27,9 @@ public class BowlingGameTest {
     public void scoreShouldBeSixteenForOneSpare() {
         rollSpare();
         game.roll(3);
+        game.roll(5);
         rollMany(17, 0);
-        assertEquals(16, game.score());
+        assertEquals(21, game.score());
     }
 
     @Test
